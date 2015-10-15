@@ -25,18 +25,6 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>it.baeyens.arduinonature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>arduino/core</name>
-			<type>2</type>
-			<locationURI>ArduinoPlatformPath/arduino</locationURI>
-		</link>
-		<link>
-			<name>arduino/variant</name>
-			<type>2</type>
-			<locationURI>ArduinoPinPath/eightanaloginputs</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
