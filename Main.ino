@@ -48,12 +48,24 @@
 EEPROM memory;
 IO inout;
 
+// index values for various variables
+#define THERM_VAR 0			// thermistor variable index location
+#define ON_VAR 1			// circulator on duration variable index location
+#define OFF_VAR 2			// circulator off duration variable index location
+#define THRESH_VAR 3		// temperature threshold variable index location
+
+	// variable declarations
+unsigned int variables[4];	// holds current temperature, on and off times, threshold
+
 void setup() {
 		// initialize and enable IO and EEPROM objects
 	memory.init();
 	memory.enable();
 	inout.init();
 	inout.enable();
+
+		// get variables from EEPROM
+	variables = memory.read();	// make sure to update read function so it returns this type
 }
 
 void loop() {

@@ -7,6 +7,8 @@ class EEPROM {
 		bool getEnabled();
 		void enable();
 		void disable();
+		void write();
+		void read();
 };
 
 #endif

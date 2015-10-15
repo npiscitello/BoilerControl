@@ -1,11 +1,7 @@
 #include "EEPROM.h"
 #include "IO.h"
 
-	// index values for various variables
-#define THERM_VAR 0			// thermistor variable index location
-#define ON_VAR 1			// circulator on duration variable index location
-#define OFF_VAR 2			// circulator off duration variable index location
-#define THRESH_VAR 3		// temperature threshold variable index location
+
 
 class MetaManagement {
 

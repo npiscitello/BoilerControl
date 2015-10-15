@@ -3,18 +3,20 @@
 
 * integrate MetaManagement to main - its doing the same function, just as a class. It was useful when
 	everything was in one file, not anymore.  The other classes should make it readable enough.
+	* possibly introduce a utilities class for miscellaneous functions if loop() becomes too crowded
 * eliminate Timer class
 	- delegate full thermistor control to IO class only
 		* not IO's job to keep track of the value; main does that
 	* update display only when IO display update method called
 		* only call IO display update method when something changes
 	* delegate timing to main - use millis() to compare with every call of execute()
-		* use this as a periodic task timer for thermistor reading and (possibly, if above doesn't work)
-			display outputting
+		* use this as a periodic task timer for thermistor reading and (possibly, if above doesn't work) display
 		* use this as a timer for circulators
 * possibly integrate EEPROM class into IO - depends on how complex the functions are to manage it
 				
 * WHEN newly structured code works, implement EEPROM save/restore
+	* implement wear-leveling for every new value save; shouldn't be a lot of writing, but there's no reason
+		to put more wear on a sector than necessary
 
 
 
