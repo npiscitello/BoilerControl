@@ -39,7 +39,7 @@
 	// constant definitions
 #define BAUD 57600			// serial comms baud rate (used for debugging)
 #define MAXDIG 9			// largest number for one displayed digit
-#define TEMP_READ 125		// in ms - delay between thermistor readings
+#define TEMP_DELAY 125		// in ms - delay between thermistor readings
 #define OUTPUT_DELAY 50		// in ms - delay between display updates
 #define TIMEOUT 10000		// in ms - delay before display returns to temperature
 #define THRESH_PAD 10000	// in ms - time thermistor must stay on one side of threshold to trigger
@@ -57,6 +57,7 @@ IO inout;
 	// variable declarations
 unsigned int variables[4];	// holds current temperature, on and off times, threshold
 unsigned int index;			// holds current selection in variable array
+unsigned int temperature;	// holds current temperature in *F
 
 void setup() {
 		// initialize and enable IO and EEPROM objects
@@ -71,9 +72,13 @@ void setup() {
 
 void loop() {
 
-		// update display every so often - when there is more code here, try to implement smart
-		// updating (only update the display when something changes)
+		// update display every so often - later, only update display if something changes (if possible)
 	if(millis%OUTPUT_DELAY == 0) {
 		inout.output(variables[index], index);
+	}
+
+		// update thermistor value every so often - implement averaging if the value is very unstable...
+	if(millis%TEMP_DELAY == 0) {
+		temperature = inout.getTherm();
 	}
 }

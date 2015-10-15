@@ -55,7 +55,7 @@ class IO {
 	}
 
 	public:
-		// set number of iterations the display for() loop goes
+		// initialize IO values
 	void init() {
 
 			// initialize relay port
