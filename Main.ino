@@ -33,13 +33,27 @@
  *  \    Is it ironic that this has a boilerplate comment at the top?    /  *
  *   \__________________________________________________________________/   */
 
-#include "Circulator.h"
 #include "EEPROM.h"
 #include "IO.h"
-#include "MetaManagement.h"
+
+	// constant definitions
+#define BAUD 57600			// serial comms baud rate (used for debugging)
+#define MAXDIG 9			// largest number for one displayed digit
+#define TEMP_READ 125		// in ms - delay between thermistor readings
+#define OUTPUT_DELAY 50		// in ms - delay between display updates
+#define TIMEOUT 10000		// in ms - delay before display returns to temperature
+#define THRESH_PAD 10000	// in ms - time thermistor must stay on one side of threshold to trigger
+
+	// define objects for each class
+EEPROM memory;
+IO inout;
 
 void setup() {
-
+		// initialize and enable IO and EEPROM objects
+	memory.init();
+	memory.enable();
+	inout.init();
+	inout.enable();
 }
 
 void loop() {

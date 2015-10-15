@@ -1,34 +1,3 @@
-	// constant definitions
-#define BAUD 57600			// serial comms baud rate (used for debugging)
-#define MAXDIG 9			// largest number for one displayed digit
-#define TEMP_READ 125		// in ms - delay between thermistor readings
-#define OUTPUT_DELAY 50		// in ms - delay between display updates
-#define TIMEOUT 10000		// delay (in ms) before display returns to temperature
-#define THRESH_PAD 10000	// time (in ms) thermistor must stay on one side of threshold to trigger
-
-
-
-
-
-
-
-
-
-	// define various task scheduler tasks
-
-Task circTask(0, -1, &circOn);
-Task circOffTask(0, 1, &circOff);
-Task updateDisplay(OUTPUT_DELAY, -1, &output);
-Scheduler task_scheduler;
-
-	// define working variables
-int sum = 0, num = 0;
-volatile bool button_pressed = false;
-
-
-
-
-
 	// button press ISR - sets a variable for mgmt to read (how many button presses this execution)
 void buttonHandler() {
 	button_pressed = true;
@@ -67,24 +36,8 @@ void setup() {
 		// initialize serial comms for debugging
 	//Serial.begin(BAUD);
 
-		// wake up display driver, set brightness, and clear
-	disp.shutdown(0, false); disp.setIntensity(0, 8); disp.clearDisplay(0);
-
-		// initialize the encoder
-	enc.write(0);
-  
-		// initialize relay port
-	pinMode(RELAY, OUTPUT);
-
 		// initialize button interrupt for indexing
 	attachInterrupt(BUTTON - 2, buttonHandler, FALLING);
-
-		// setup periodic tasks
-	task_scheduler.init();
-	task_scheduler.addTask(readTherm);
-	task_scheduler.addTask(updateDisplay);
-	task_scheduler.addTask(circTask);
-	task_scheduler.addTask(circOffTask);
 
 		// initialize all objects - mostly consists of setting up or retrieving variables
 	interface.init();

@@ -56,10 +56,21 @@ class IO {
 	public:
 		// set number of iterations the display for() loop goes
 	void init() {
+
+			// initialize relay port
+		pinMode(RELAY, OUTPUT);
+
+			// wake up display driver, set brightness, and clear
+		disp.shutdown(0, false); disp.setIntensity(0, 8); disp.clearDisplay(0);
+
+			// initialize the encoder
+		enc.write(0);
+
 		for(int i = 0; i < ARRAY_SIZE; i++) {
 			display_vars[i] = ' ';
 			index_vars[i] = false;
 		}
+
 		enabled = false;
 	}
 

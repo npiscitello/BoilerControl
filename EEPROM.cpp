@@ -2,9 +2,22 @@ class EEPROM {
 
 	private:
 		// define variables
+	bool enabled;
 
 	public:
 		void init() {
-			// initialization code here
+			enabled = false;
+		}
+
+		bool getEnabled() {
+			return enabled;
+		}
+
+		void enable() {
+			enabled = true;
+		}
+
+		void disable() {
+			enabled = false;
 		}
 };

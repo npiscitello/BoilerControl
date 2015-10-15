@@ -1,11 +1,34 @@
 * thing to do
 - thing already done
 
+* integrate MetaManagement to main - its doing the same function, just as a class. It was useful when
+	everything was in one file, not anymore.  The other classes should make it readable enough.
 * eliminate Timer class
-	* delegate full circulator control (including timing) to circulator class
 	- delegate full thermistor control to IO class only
-		* not IO's job to keep track of the value; MetaMgmt does that
+		* not IO's job to keep track of the value; main does that
 	* update display only when IO display update method called
 		* only call IO display update method when something changes
-		
+	* delegate timing to main - use millis() to compare with every call of execute()
+		* use this as a periodic task timer for thermistor reading and (possibly, if above doesn't work)
+			display outputting
+		* use this as a timer for circulators
+* possibly integrate EEPROM class into IO - depends on how complex the functions are to manage it
+				
 * WHEN newly structured code works, implement EEPROM save/restore
+
+
+
+IO TASKS:
+	- provide an interface to read/write:
+		- display(s)
+		- buttons/switches/encoders/etc
+		- sensors (thermistor, etc)
+		
+EEPROM TASKS:
+	- provide an interface to read/write EEPROM memory
+	- optionally keep track of other variables (not in eeprom)
+	
+MAIN TASKS:
+	- timing
+	- keep track of variables
+	- do cool stuff
