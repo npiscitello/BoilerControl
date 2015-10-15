@@ -4,9 +4,9 @@
 class IO {
 	public:
 		void init();
+		bool getEnabled();
 		int getEncoder();
 		int getTherm();
-		void updateTherm();
 		void output();
 		void enable();
 		void disable();

@@ -1,15 +1,6 @@
-	// include LED, encoder, and scheduler libraries
-#include <LedControl.h>
-#include <Encoder.h>
-#include <TaskScheduler.h>
-
 	// constant definitions
 #define BAUD 57600			// serial comms baud rate (used for debugging)
-#define NUMVARS 4			// number of LEDs in display (also how many index locations)
-#define NUMDIGS 3			// number of digits in display
-#define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
 #define MAXDIG 9			// largest number for one displayed digit
-#define NUMSAMPLES 16		// number of samples used in thermistor averaging
 #define TEMP_READ 125		// in ms - delay between thermistor readings
 #define OUTPUT_DELAY 50		// in ms - delay between display updates
 #define TIMEOUT 10000		// delay (in ms) before display returns to temperature
@@ -19,20 +10,12 @@
 
 
 
-	// thermistor calculation definitions
-#define RC 3900
-#define T0 0.00335401643	// 1 / 298.15
-#define B 4500
-#define R0 50000
 
-	// define an LED driver chip
-LedControl disp = LedControl(LED_DAT, LED_CLK, LED_SEL, 1);
 
-	// define an encoder
-Encoder enc = Encoder(ENC1, ENC2);
+
 
 	// define various task scheduler tasks
-Task readTherm(TEMP_READ, -1, &thermRead);
+
 Task circTask(0, -1, &circOn);
 Task circOffTask(0, 1, &circOff);
 Task updateDisplay(OUTPUT_DELAY, -1, &output);
@@ -53,19 +36,7 @@ void buttonHandler() {
 
 	// obtain and average thermistor reading - only outside of IO class for the task scheduler
 void thermRead() {
-		// receive and adjust thermistor reading to *F
-	float F = analogRead(THERM);
-	F = (RC * F) / (1023 - F);
-	F = log(F / R0);
-	F = 1 / (F / B + T0);
-	F = F * 1.8 - 459.67;
-	sum += round(F);
-	num++;
-		// if numsamples reached, dump new thermistor reading into the thermistor variable
-	if(num == NUMSAMPLES) {
-		interface.updateTherm((sum / num));
-		sum = num = 0;
-	}
+
 }
 
 	// turn the circulator on and enable the circulator off task

@@ -1,7 +1,24 @@
+/*
+ * This class serves as a one-stop-shop for all things world-related. Whether it be
+ * reading a sensor or displaying some numbers, here's your guy!
+ */
+
 #include "Encoder.h"
 #include "LedControl.h"
 
-// pin definitions
+	// constant definitions
+#define NUMVARS 4			// number of LEDs in display (also how many index locations)
+#define NUMDIGS 3			// number of digits in display
+#define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
+#define NUMSAMPLES 16		// number of samples used in thermistor averaging
+
+	// thermistor calculation definitions
+#define RC 3900
+#define T0 0.00335401643	// 1 / 298.15
+#define B 4500
+#define R0 50000
+
+	// pin definitions
 #define LED_DAT 8			// data to the LED driver chip
 #define LED_CLK 7			// clock to the LED driver chip
 #define LED_SEL 9			// selector lead to the LED driver chip
@@ -11,13 +28,19 @@
 #define RELAY 6				// relay pin
 #define THERM A0			// thermistor pin
 
+	// define an LED driver chip
+LedControl disp = LedControl(LED_DAT, LED_CLK, LED_SEL, 1);
+
+	// define an encoder
+Encoder enc = Encoder(ENC1, ENC2);
+
 class IO {
 
 	private:
 		// define variables
 	int enc_value, old_enc_value;
-	unsigned int output_temp, therm_value;
 	char display_vars[ARRAY_SIZE];  bool index_vars[ARRAY_SIZE];
+	bool enabled;
 
     	// return the relative encoder value since last read
 	int readEncoderRelative() {
@@ -31,6 +54,20 @@ class IO {
 	}
 
 	public:
+		// set number of iterations the display for() loop goes
+	void init() {
+		for(int i = 0; i < ARRAY_SIZE; i++) {
+			display_vars[i] = ' ';
+			index_vars[i] = false;
+		}
+		enabled = false;
+	}
+
+		// returns the enabled/disabled status
+	bool getEnabled() {
+		return enabled;
+	}
+
 		// update the encoder value when asked
 	int getEncoder() {
 		return readEncoderRelative();
@@ -38,20 +75,11 @@ class IO {
 
 		// returns the thermistor reading in *F
 	int getTherm() {
-		return therm_value;
-	}
-
-		// update the thermistor value from the averaging function
-	void updateTherm(int update_value) {
-		therm_value = update_value;
-	}
-
-		// set number of iterations the display for() loop goes
-	void init() {
-		for(int i = 0; i < ARRAY_SIZE; i++) {
-			display_vars[i] = ' ';
-			index_vars[i] = false;
-		}
+		float F = analogRead(THERM);
+		F = (RC * F) / (1023 - F);
+		F = log(F / R0);
+		F = 1 / (F / B + T0);
+		return round(F * 1.8 - 459.67);
 	}
 
 		// display values when asked - receives the number to be displayed and the index
@@ -75,16 +103,14 @@ class IO {
 		}
 	}
 
-		// enable continuous thermistor averaging and display updates
+		// enable all IO functions (thermistor averaging, display updates)
 	void enable() {
-		readTherm.enable();
-		updateDisplay.enable();
+		enabled = true;
 	}
 
-		// disable continuous thermistor averaging and display updates
+		// disable all IO functions (thermistor averaging, display updates)
 	void disable() {
-		readTherm.disable();
-		updateDisplay.disable();
+		enabled = false;
 	}
 
 };

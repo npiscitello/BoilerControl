@@ -1,5 +1,11 @@
+* thing to do
+- thing already done
+
 * eliminate Timer class
 	* delegate full circulator control (including timing) to circulator class
-	* delegate full IO control to IO class
-	
+	* delegate full thermistor control to IO class
+		* not IO's job to keep track of the value; MetaMgmt does that
+	* update display only when IO display update method called
+		* only call IO display update method when something changes
+		
 * WHEN newly structured code works, implement EEPROM save/restore
