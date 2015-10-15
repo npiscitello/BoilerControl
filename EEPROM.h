@@ -4,9 +4,6 @@
 class EEPROM {
 	public:
 		void init();
-		bool getEnabled();
-		void enable();
-		void disable();
 		void write();
 		void read();
 };

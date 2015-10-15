@@ -60,11 +60,9 @@ unsigned int index;			// holds current selection in variable array
 unsigned int temperature;	// holds current temperature in *F
 
 void setup() {
-		// initialize and enable IO and EEPROM objects
+		// initialize IO and EEPROM objects
 	memory.init();
-	memory.enable();
 	inout.init();
-	inout.enable();
 
 		// get variables from EEPROM
 	variables = memory.read();	// make sure to update read function so it returns this type

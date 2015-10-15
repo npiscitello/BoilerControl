@@ -71,13 +71,6 @@ class IO {
 			display_vars[i] = ' ';
 			index_vars[i] = false;
 		}
-
-		enabled = false;
-	}
-
-		// returns the enabled/disabled status
-	bool getEnabled() {
-		return enabled;
 	}
 
 		// update the encoder value when asked
@@ -123,16 +116,6 @@ class IO {
 		// toggle relay to turn circulators off
 	void circOff() {
 		digitalWrite(RELAY, LOW);
-	}
-
-		// enable all IO functions (thermistor averaging, display updates)
-	void enable() {
-		enabled = true;
-	}
-
-		// disable all IO functions (thermistor averaging, display updates)
-	void disable() {
-		enabled = false;
 	}
 
 		// enable serial comms for debugging
