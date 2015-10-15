@@ -1,0 +1,5 @@
+* eliminate Timer class
+	* delegate full circulator control (including timing) to circulator class
+	* delegate full IO control to IO class
+	
+* WHEN newly structured code works, implement EEPROM save/restore
