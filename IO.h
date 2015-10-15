@@ -8,6 +8,8 @@ class IO {
 		int getEncoder();
 		int getTherm();
 		void output();
+		void circOn();
+		void circOff();
 		void enable();
 		void disable();
 };

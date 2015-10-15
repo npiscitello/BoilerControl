@@ -103,6 +103,16 @@ class IO {
 		}
 	}
 
+		// toggle relay to turn circulators on
+	void circOn() {
+		digitalWrite(RELAY, HIGH);
+	}
+
+		// toggle relay to turn circulators off
+	void circOff() {
+		digitalWrite(RELAY, LOW);
+	}
+
 		// enable all IO functions (thermistor averaging, display updates)
 	void enable() {
 		enabled = true;
