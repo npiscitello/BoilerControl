@@ -10,11 +10,6 @@ RM := rm -rf
 -include sources.mk
 -include subdir.mk
 -include arduino/core/subdir.mk
--include MetaManagement/subdir.mk
--include Main/subdir.mk
--include IO/subdir.mk
--include EEPROM/subdir.mk
--include Circulator/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

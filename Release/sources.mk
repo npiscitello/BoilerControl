@@ -39,9 +39,4 @@ CPP_DEPS :=
 SUBDIRS := \
 . \
 arduino/core \
-Circulator \
-EEPROM \
-IO \
-Main \
-MetaManagement \
 

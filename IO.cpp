@@ -1,3 +1,16 @@
+#include "Encoder.h"
+#include "LedControl.h"
+
+// pin definitions
+#define LED_DAT 8			// data to the LED driver chip
+#define LED_CLK 7			// clock to the LED driver chip
+#define LED_SEL 9			// selector lead to the LED driver chip
+#define ENC1 2				// first encoder pin
+#define ENC2 4				// second encoder pin
+#define BUTTON 11			// encoder button pin
+#define RELAY 6				// relay pin
+#define THERM A0			// thermistor pin
+
 class IO {
 
 	private:
