@@ -7,7 +7,7 @@ class MetaManagement {
 
 	private:
 			// define variables
-		int index, relative_encoder;
+		int relative_encoder;
 		unsigned int vars[NUMVARS];
 		long last_event, thresh_cross;
 		bool above_thresh, prev_thresh, cross;

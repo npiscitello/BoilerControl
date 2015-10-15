@@ -7,11 +7,13 @@ class IO {
 		bool getEnabled();
 		int getEncoder();
 		int getTherm();
-		void output();
+		void output(int,int);
 		void circOn();
 		void circOff();
 		void enable();
 		void disable();
+		void serialEnable();
+		void serialWrite(String);
 };
 
 #endif

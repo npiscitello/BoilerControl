@@ -33,8 +33,7 @@ void setup() {
 		// initialize button ports w/ pullup enabled
 	pinMode(BUTTON, INPUT_PULLUP);
 
-		// initialize serial comms for debugging
-	//Serial.begin(BAUD);
+
 
 		// initialize button interrupt for indexing
 	attachInterrupt(BUTTON - 2, buttonHandler, FALLING);

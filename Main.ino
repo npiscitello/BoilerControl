@@ -56,6 +56,7 @@ IO inout;
 
 	// variable declarations
 unsigned int variables[4];	// holds current temperature, on and off times, threshold
+unsigned int index;			// holds current selection in variable array
 
 void setup() {
 		// initialize and enable IO and EEPROM objects
@@ -70,4 +71,9 @@ void setup() {
 
 void loop() {
 
+		// update display every so often - when there is more code here, try to implement smart
+		// updating (only update the display when something changes)
+	if(millis%OUTPUT_DELAY == 0) {
+		inout.output(variables[index], index);
+	}
 }

@@ -11,6 +11,7 @@
 #define NUMDIGS 3			// number of digits in display
 #define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
 #define NUMSAMPLES 16		// number of samples used in thermistor averaging
+#define BAUD 57600			// baud rate for serial debugging
 
 	// thermistor calculation definitions
 #define RC 3900
@@ -132,6 +133,16 @@ class IO {
 		// disable all IO functions (thermistor averaging, display updates)
 	void disable() {
 		enabled = false;
+	}
+
+		// enable serial comms for debugging
+	void serialEnable() {
+		Serial.begin(BAUD);
+	}
+
+		// make sure to call serialEnable first...
+	void serialWrite(String data) {
+		Serial.println(data);
 	}
 
 };
