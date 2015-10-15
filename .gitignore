@@ -1,13 +1,6 @@
-/arduino/
-
-/Release/
-
-/spec.d
-
 /.settings/
-
-/.ino.cpp
-
+/arduino/
+/Release/
 /.cproject
-
 /.project
+/spec.d
