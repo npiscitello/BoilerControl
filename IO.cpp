@@ -1,5 +1,4 @@
-/*
- * This class serves as a one-stop-shop for all things world-related. Whether it be
+/* This class serves as a one-stop-shop for all things world-related. Whether it be
  * reading a sensor or displaying some numbers, here's your guy!
  */
 
@@ -54,6 +53,10 @@ class IO {
 		return enc_value - old_enc_value;
 	}
 
+	void buttonHandler() {
+
+	}
+
 	public:
 		// initialize IO values
 	void init() {
@@ -66,6 +69,10 @@ class IO {
 
 			// initialize the encoder
 		enc.write(0);
+
+			// initialize button
+		pinMode(BUTTON, INPUT_PULLUP);
+		attachInterrupt(BUTTON - 2, buttonHandler, FALLING);
 
 		for(int i = 0; i < ARRAY_SIZE; i++) {
 			display_vars[i] = ' ';

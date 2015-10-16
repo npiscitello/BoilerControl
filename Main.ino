@@ -70,6 +70,7 @@ void setup() {
 
 void loop() {
 
+
 		// update display every so often - later, only update display if something changes (if possible)
 	if(millis%OUTPUT_DELAY == 0) {
 		inout.output(variables[index], index);
