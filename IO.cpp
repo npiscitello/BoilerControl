@@ -38,7 +38,7 @@ class IO {
 
 	private:
 		// define variables
-	int enc_value, old_enc_value, button_presses = 0;
+	int enc_value, old_enc_value, button_presses;
 	unsigned long last_event;		// holds time of last input event (for timeout calculations)
 	unsigned long last_circ_action;	// holds time of last circulator on/off call
 	char display_vars[ARRAY_SIZE];  bool index_vars[ARRAY_SIZE];
@@ -140,7 +140,7 @@ class IO {
 		// toggle relay to turn circulators off
 	void circOff() {
 		circ_state = false;
-		last_circ_action = millis()
+		last_circ_action = millis();
 		digitalWrite(RELAY, LOW);
 	}
 

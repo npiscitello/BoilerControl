@@ -108,15 +108,6 @@ void loop() {
 		index = THERM_VAR;
 	}
 
-		// check threshold every so often - compare delay prevents bouncing
-	if(millis % THRESH_DELAY == 0) {
-		if(temperature > variables[THRESH_VAR]) {
-			above_thresh = true;
-		} else {
-			above_thresh = false;
-		}
-	}
-
 		// turn the circulators on/off if threshold is met
 	if(above_thresh) {
 			// if the circulators are on and they've been on for long enough...
@@ -127,13 +118,22 @@ void loop() {
 		}
 	}
 
+		// check threshold every so often - compare delay prevents bouncing
+	if(millis() % THRESH_DELAY == 0) {
+		if(temperature > variables[THRESH_VAR]) {
+			above_thresh = true;
+		} else {
+			above_thresh = false;
+		}
+	}
+
 		// update display every so often - later, only update display if something changes (if possible)
-	if(millis % OUTPUT_DELAY == 0) {
+	if(millis() % OUTPUT_DELAY == 0) {
 		inout.output(variables[index], index);
 	}
 
 		// update thermistor value every so often - implement averaging if the value is very unstable...
-	if(millis % TEMP_DELAY == 0) {
+	if(millis() % TEMP_DELAY == 0) {
 		temperature = inout.getTherm();
 	}
 }
