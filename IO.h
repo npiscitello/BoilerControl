@@ -3,14 +3,18 @@
 
 class IO {
 	public:
-		void init();
-		int getEncoder();
-		int getTherm();				// returns thermistor reading in *F
-		void output(int,int);
-		void circOn();
-		void circOff();
-		void serialEnable();
-		void serialWrite(String);	// make sure to call serialEnable first...
+		void init();						// initializes functions
+		int getEncoder();					// returns the relative encoder read since last call
+		int getButtonPresses();				// returns number of button presses since last read
+		int getTherm();						// returns thermistor reading in *F
+		unsigned long getLastEvent();		// returns millis() output of last input for timeout calculations
+		void output(int,int);				// outputs to LEDs and display
+		void circOn();						// turns circulators on
+		void circOff();						// turns circulators off
+		bool getCircState();				// returns circulator state
+		unsigned long getLastCircAction();	// returns millis() output of last circulator on/off call
+		void serialEnable();				// enables serial comms
+		void serialWrite(String);			// prints to the serial terminal
 };
 
 #endif

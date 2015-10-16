@@ -38,23 +38,27 @@ class IO {
 
 	private:
 		// define variables
-	int enc_value, old_enc_value;
+	int enc_value, old_enc_value, button_presses = 0;
+	unsigned long last_event;		// holds time of last input event (for timeout calculations)
+	unsigned long last_circ_action;	// holds time of last circulator on/off call
 	char display_vars[ARRAY_SIZE];  bool index_vars[ARRAY_SIZE];
-	bool enabled;
+	bool circ_state;	// holds on(true)/off(false) state of circulator
 
     	// return the relative encoder value since last read
 	int readEncoderRelative() {
-		// read encoder value
+    	// this library registers 2 counts per "click", so adjust down to
+    	// one count per "click" for intuitiveness
 		old_enc_value = enc_value;
 		enc_value = (enc.read())/2;
-			// calculate and return difference between this read and last read:
-        	// this library registers 2 counts per "click", so adjust down to
-        	// one count per "click" for intuitiveness
+		if(enc_value - old_enc_value != 0) {
+			last_event = millis();
+		}
 		return enc_value - old_enc_value;
 	}
 
 	void buttonHandler() {
-
+		button_presses++;
+		last_event = millis();
 	}
 
 	public:
@@ -80,9 +84,16 @@ class IO {
 		}
 	}
 
-		// update the encoder value when asked
+		// returns the encoder value
 	int getEncoder() {
 		return readEncoderRelative();
+	}
+
+		// returns the number of button presses since last call, clears button press variable
+	int getButtonPresses() {
+		int button_press_holder = button_presses;
+		button_presses = 0;
+		return button_press_holder;
 	}
 
 		// returns the thermistor reading in *F
@@ -92,6 +103,10 @@ class IO {
 		F = log(F / R0);
 		F = 1 / (F / B + T0);
 		return round(F * 1.8 - 459.67);
+	}
+
+	unsigned long getLastEvent() {
+		return last_event;
 	}
 
 		// display values when asked - receives the number to be displayed and the index
@@ -117,12 +132,24 @@ class IO {
 
 		// toggle relay to turn circulators on
 	void circOn() {
+		circ_state = true;
+		last_circ_action = millis();
 		digitalWrite(RELAY, HIGH);
 	}
 
 		// toggle relay to turn circulators off
 	void circOff() {
+		circ_state = false;
+		last_circ_action = millis()
 		digitalWrite(RELAY, LOW);
+	}
+
+	bool getCircState() {
+		return circ_state;
+	}
+
+	unsigned long getLastCircAction() {
+		return last_circ_action;
 	}
 
 		// enable serial comms for debugging
