@@ -5,6 +5,7 @@ class IO {
 	public:
 		void init();						// initializes functions
 		int getEncoder();					// returns the relative encoder read since last call
+		void buttonHandler();				// responds to button ISR
 		int getButtonPresses();				// returns number of button presses since last read
 		int getTherm();						// returns thermistor reading in *F
 		unsigned long getLastEvent();		// returns millis() output of last input for timeout calculations

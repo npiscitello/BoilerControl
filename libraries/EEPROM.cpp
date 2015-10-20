@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 class EEPROM {
 
 	private:
@@ -6,19 +8,7 @@ class EEPROM {
 
 	public:
 		void init() {
-			enabled = false;
-		}
 
-		bool getEnabled() {
-			return enabled;
-		}
-
-		void enable() {
-			enabled = true;
-		}
-
-		void disable() {
-			enabled = false;
 		}
 
 		void write() {

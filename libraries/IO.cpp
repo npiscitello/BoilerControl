@@ -2,6 +2,7 @@
  * reading a sensor or displaying some numbers, here's your guy!
  */
 
+#include <Arduino.h>
 #include "Encoder.h"
 #include "LedControl.h"
 
@@ -24,7 +25,6 @@
 #define LED_SEL 9			// selector lead to the LED driver chip
 #define ENC1 2				// first encoder pin
 #define ENC2 4				// second encoder pin
-#define BUTTON 11			// encoder button pin
 #define RELAY 6				// relay pin
 #define THERM A0			// thermistor pin
 
@@ -38,11 +38,14 @@ class IO {
 
 	private:
 		// define variables
-	int enc_value, old_enc_value, button_presses;
+	int enc_value;					// current encoder value
+	int old_enc_value;				// previous encoder value
+	int button_presses;				// how many button presses since last call
 	unsigned long last_event;		// holds time of last input event (for timeout calculations)
 	unsigned long last_circ_action;	// holds time of last circulator on/off call
-	char display_vars[ARRAY_SIZE];  bool index_vars[ARRAY_SIZE];
-	bool circ_state;	// holds on(true)/off(false) state of circulator
+	char display_vars[ARRAY_SIZE];  // display digits
+	bool index_vars[ARRAY_SIZE];	// variable indicator display values
+	bool circ_state;				// holds on(true)/off(false) state of circulator
 
     	// return the relative encoder value since last read
 	int readEncoderRelative() {
@@ -56,12 +59,8 @@ class IO {
 		return enc_value - old_enc_value;
 	}
 
-	void buttonHandler() {
-		button_presses++;
-		last_event = millis();
-	}
-
 	public:
+
 		// initialize IO values
 	void init() {
 
@@ -74,10 +73,6 @@ class IO {
 			// initialize the encoder
 		enc.write(0);
 
-			// initialize button
-		pinMode(BUTTON, INPUT_PULLUP);
-		attachInterrupt(BUTTON - 2, buttonHandler, FALLING);
-
 		for(int i = 0; i < ARRAY_SIZE; i++) {
 			display_vars[i] = ' ';
 			index_vars[i] = false;
@@ -87,6 +82,12 @@ class IO {
 		// returns the encoder value
 	int getEncoder() {
 		return readEncoderRelative();
+	}
+
+		// function for ISR
+	void buttonHandler() {
+		button_presses++;
+		last_event = millis();
 	}
 
 		// returns the number of button presses since last call, clears button press variable
