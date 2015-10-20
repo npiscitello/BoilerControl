@@ -106,6 +106,7 @@ class IO {
 		return round(F * 1.8 - 459.67);
 	}
 
+		// returns millis() output of last input for timeout calculations
 	unsigned long getLastEvent() {
 		return last_event;
 	}
@@ -145,10 +146,12 @@ class IO {
 		digitalWrite(RELAY, LOW);
 	}
 
+		// returns circulator state
 	bool getCircState() {
 		return circ_state;
 	}
 
+		// returns millis() output of last circulator on/off call
 	unsigned long getLastCircAction() {
 		return last_circ_action;
 	}
