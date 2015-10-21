@@ -8,7 +8,7 @@ class IO {
 			// define variables
 		int enc_value;					// current encoder value
 		int old_enc_value;				// previous encoder value
-		int button_presses;				// how many button presses since last call
+		volatile int button_presses;	// how many button presses since last call
 		unsigned long last_input_event;	// holds time of last input event (for timeout calculations)
 		unsigned long last_circ_action;	// holds time of last circulator on/off call
 		char display_vars[ARRAY_SIZE];  // display digits

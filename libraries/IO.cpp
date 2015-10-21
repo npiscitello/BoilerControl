@@ -12,6 +12,7 @@
 #define NUMDIGS 3			// number of digits in display
 #define NUMSAMPLES 16		// number of samples used in thermistor averaging
 #define BAUD 57600			// baud rate for serial debugging
+#define DEBOUNCE_TIME 3		// ms pause to debounce button
 
 	// thermistor calculation definitions
 #define RC 3900
@@ -40,7 +41,7 @@ void IO::init() {
 	pinMode(RELAY, OUTPUT);
 
 		// wake up display driver, set brightness, and clear
-	disp.shutdown(0, false); disp.setIntensity(0, 8); disp.clearDisplay(0);
+	disp.shutdown(0, false); disp.setIntensity(0, 12); disp.clearDisplay(0);
 
 		// initialize the encoder
 	enc.write(0);
@@ -63,9 +64,11 @@ int IO::getEncoder() {
 	return enc_value - old_enc_value;
 }
 
-	// function for ISR
+	// function for ISR - crudely debounced
 void IO::buttonHandler() {
-	button_presses++;
+	if(millis() - last_input_event >= DEBOUNCE_TIME) {
+		button_presses++;
+	}
 	last_input_event = millis();
 }
 

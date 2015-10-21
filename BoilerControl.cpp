@@ -39,7 +39,7 @@
 #include "IO.h"
 
 	// pin definitions
-#define BUTTON 11					// encoder button pin
+#define BUTTON 3					// encoder button pin
 
 	// constant definitions
 #define MAXDIG 9					// largest number for one displayed digit
@@ -69,7 +69,7 @@ IO inout;
 
 // button ISR
 void buttonISR() {
-	inout.buttonHandler();
+inout.buttonHandler();
 }
 
 void setup() {
@@ -79,7 +79,7 @@ void setup() {
 
 		// initialize button - not in IO because interrupt requires it to be in main loop
 	pinMode(BUTTON, INPUT_PULLUP);
-	attachInterrupt(BUTTON - 2, buttonISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, FALLING);
 
 		// get variables from EEPROM
 	//variables = memory.read();	// make sure to update read function so it returns this type
@@ -140,7 +140,7 @@ void loop() {
 		inout.output(variables[index], index);
 	}
 
-		// update thermistor value every so often - later, implement averaging if the value is very unstable
+		// update thermistor value every so often - IMPLEMENT AVERAGING FUNCTION
 	if(millis() % TEMP_DELAY == 0) {
 		variables[TEMP_VAR] = inout.getTherm();
 	}
