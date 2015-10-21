@@ -4,12 +4,12 @@
  * (                                                                      ) *
  *  )   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   (  *
  * (                                                                      ) *
- *  )   Dependencies:                                                    (  *
+ *  )   Dependencies (included in repository):                           (  *
  * (      - LedControl library: https://github.com/wayoda/LedControl      ) *
  *  )	  - Encoder library:                                             (  *
  * (             http://www.pjrc.com/teensy/td_libs_Encoder.html          ) *
- *  )     - TaskScheduler library:                                       (  *
- * (             http://playground.arduino.cc/Code/TaskScheduler          ) *
+ *  )     - IO library - custom written for application                  (
+ * (      - EEPROM library - custom written for application               )
  *  )                                                                    (  *
  * (    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    ) *
  *  )                                                                    (  *
