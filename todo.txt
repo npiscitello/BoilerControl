@@ -9,7 +9,8 @@
 	- delegate full thermistor control to IO class only
 		- not IO's job to keep track of the value; main does that
 	- update display only when IO display update method called
-		* only call IO display update method when something changes
+		- only call IO display update method when something changes
+			(not implemented - not worth the extra effort)
 	- delegate timing to main - use millis() to compare with every call of execute()
 		- use this as a periodic task timer for thermistor reading and (possibly, if above doesn't work) display
 		- use this as a timer for circulators

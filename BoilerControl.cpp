@@ -51,6 +51,8 @@
 #define TIMEOUT 10000				// in ms - delay before display returns to temperature
 #define ON_OFF_CONV 60000			// conversion factor for ON and OFF variables to use in circulator
 									// timing - converts display units to ms (currently minutes -> ms)
+#define ALPHA 0.1					// alpha value for averaging function
+#define ONE_MIN_ALPHA 0.9			// 1 - alpha value for averaging function
 
 	// index values for data variables
 #define TEMP_VAR 0					// thermistor variable index location
@@ -62,6 +64,7 @@
 unsigned int variables[NUMVARS];	// holds current temperature, on and off times, threshold
 unsigned int index;					// holds current selection in variable array
 bool above_thresh;					// holds the state of stove temperature comparison
+int encoder;						// holds current encoder reading
 
 	// instantiate classes
 EEPROM memory;
@@ -97,22 +100,35 @@ void loop() {
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
-	if(index != TEMP_VAR) {
-		variables[index] += inout.getEncoder();
-	} else {
-		inout.getEncoder();
+		// test lower limit to ensure that the unsigned int doesn't roll over
+	encoder = inout.getEncoder();
+	if(index != TEMP_VAR && (variables[index] > 0 || (variables[index] == 0 && encoder >= 0))) {
+		variables[index] += encoder;
 	}
 
-		// handle limits - in base MAXDIG + 1
+		// handle upper limit - in base MAXDIG + 1
 	if(variables[index] > (pow(MAXDIG + 1, NUMDIGS) - 1)) {
 		variables[index] = (pow(MAXDIG + 1, NUMDIGS) - 1);
-	} else if(variables[index] < 0) {
-		variables[index] = 0;
 	}
 
 		// return to temperature display if nothing has happened in TIMEOUT ms
 	if(millis() - inout.getLastInputEvent() > TIMEOUT) {
 		index = TEMP_VAR;
+	}
+
+		// update temperature value every so often - using an exponential moving average to smooth the output
+		// don't need to check for rolling over the variable because the board won't be active if the temperature is negative
+	if(millis() % TEMP_DELAY == 0) {
+		variables[TEMP_VAR] = (ALPHA * inout.getTherm()) + ONE_MIN_ALPHA * variables[TEMP_VAR];
+	}
+
+		// check threshold every so often - compare delay prevents bouncing
+	if(millis() % THRESH_DELAY == 0) {
+		if(variables[TEMP_VAR] > variables[THRESH_VAR]) {
+			above_thresh = true;
+		} else {
+			above_thresh = false;
+		}
 	}
 
 		// turn the circulators on/off if threshold is met
@@ -126,22 +142,8 @@ void loop() {
 		}
 	}
 
-		// check threshold every so often - compare delay prevents bouncing
-	if(millis() % THRESH_DELAY == 0) {
-		if(variables[TEMP_VAR] > variables[THRESH_VAR]) {
-			above_thresh = true;
-		} else {
-			above_thresh = false;
-		}
-	}
-
-		// update display every so often - later, only update display if something changes (if possible)
+		// update display every so often
 	if(millis() % OUTPUT_DELAY == 0) {
 		inout.output(variables[index], index);
-	}
-
-		// update thermistor value every so often - IMPLEMENT AVERAGING FUNCTION
-	if(millis() % TEMP_DELAY == 0) {
-		variables[TEMP_VAR] = inout.getTherm();
 	}
 }
