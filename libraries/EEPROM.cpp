@@ -1,22 +1,15 @@
 #include <Arduino.h>
+#include "EEPROM.h"
 
-class EEPROM {
+void EEPROM::init() {
+	// probably initialize locations,etc.
+}
 
-	private:
-		// define variables
-	bool enabled;
+void EEPROM::write() {
+	// eventually take data and perform an update function -
+	// use update method and wear leveling
+}
 
-	public:
-		void init() {
-
-		}
-
-		void write() {
-			// eventually take data and perform an update function -
-			// use update method and wear leveling
-		}
-
-		void read() {
-			// eventually return data to be used in variable initializaton
-		}
-};
+void EEPROM::read() {
+	// eventually return data to be used in variable initializaton
+}

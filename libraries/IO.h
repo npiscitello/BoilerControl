@@ -1,7 +1,23 @@
 #ifndef __I_h
 #define __I_h
 
+#define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
+
 class IO {
+	private:
+			// define variables
+		int enc_value;					// current encoder value
+		int old_enc_value;				// previous encoder value
+		int button_presses;				// how many button presses since last call
+		unsigned long last_event;		// holds time of last input event (for timeout calculations)
+		unsigned long last_circ_action;	// holds time of last circulator on/off call
+		char display_vars[ARRAY_SIZE];  // display digits
+		bool index_vars[ARRAY_SIZE];	// variable indicator display values
+		bool circ_state;				// holds on(true)/off(false) state of circulator
+
+			// return the relative encoder value since last read
+		int readEncoderRelative();
+
 	public:
 		void init();										// initializes functions
 		int getEncoder();									// returns the relative encoder read since last call

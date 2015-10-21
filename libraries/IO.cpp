@@ -3,6 +3,7 @@
  */
 
 #include <Arduino.h>
+#include "IO.h"
 #include "Encoder.h"
 #include "LedControl.h"
 
@@ -34,136 +35,119 @@ LedControl disp = LedControl(LED_DAT, LED_CLK, LED_SEL, 1);
 	// define an encoder
 Encoder enc = Encoder(ENC1, ENC2);
 
-class IO {
-
-	private:
-		// define variables
-	int enc_value;					// current encoder value
-	int old_enc_value;				// previous encoder value
-	int button_presses;				// how many button presses since last call
-	unsigned long last_event;		// holds time of last input event (for timeout calculations)
-	unsigned long last_circ_action;	// holds time of last circulator on/off call
-	char display_vars[ARRAY_SIZE];  // display digits
-	bool index_vars[ARRAY_SIZE];	// variable indicator display values
-	bool circ_state;				// holds on(true)/off(false) state of circulator
-
-    	// return the relative encoder value since last read
-	int readEncoderRelative() {
-    	// this library registers 2 counts per "click", so adjust down to
-    	// one count per "click" for intuitiveness
-		old_enc_value = enc_value;
-		enc_value = (enc.read())/2;
-		if(enc_value - old_enc_value != 0) {
-			last_event = millis();
-		}
-		return enc_value - old_enc_value;
+   	// return the relative encoder value since last read
+int IO::readEncoderRelative() {
+   	// this library registers 2 counts per "click", so adjust down to
+   	// one count per "click" for intuitiveness
+	old_enc_value = enc_value;
+	enc_value = (enc.read())/2;
+	if(enc_value - old_enc_value != 0) {
+		last_event = millis();
 	}
+	return enc_value - old_enc_value;
+}
 
-	public:
+	// initialize IO values
+void IO::init() {
 
-		// initialize IO values
-	void init() {
+		// initialize relay port
+	pinMode(RELAY, OUTPUT);
 
-			// initialize relay port
-		pinMode(RELAY, OUTPUT);
+		// wake up display driver, set brightness, and clear
+	disp.shutdown(0, false); disp.setIntensity(0, 8); disp.clearDisplay(0);
 
-			// wake up display driver, set brightness, and clear
-		disp.shutdown(0, false); disp.setIntensity(0, 8); disp.clearDisplay(0);
+		// initialize the encoder
+	enc.write(0);
 
-			// initialize the encoder
-		enc.write(0);
+	for(int i = 0; i < ARRAY_SIZE; i++) {
+		display_vars[i] = ' ';
+		index_vars[i] = false;
+	}
+}
 
-		for(int i = 0; i < ARRAY_SIZE; i++) {
-			display_vars[i] = ' ';
+	// returns the encoder value
+int IO::getEncoder() {
+	return readEncoderRelative();
+}
+
+	// function for ISR
+void IO::buttonHandler() {
+	button_presses++;
+	last_event = millis();
+}
+
+	// returns the number of button presses since last call, clears button press variable
+int IO::getButtonPresses() {
+	int button_press_holder = button_presses;
+	button_presses = 0;
+	return button_press_holder;
+}
+
+	// returns the thermistor reading in *F
+int IO::getTherm() {
+	float F = analogRead(THERM);
+	F = (RC * F) / (1023 - F);
+	F = log(F / R0);
+	F = 1 / (F / B + T0);
+	return round(F * 1.8 - 459.67);
+}
+
+	// returns millis() output of last input for timeout calculations
+unsigned long IO::getLastEvent() {
+	return last_event;
+}
+
+	// display values when asked - receives the number to be displayed and the index
+void IO::output(int number_display, int index_display) {
+		// get display value and convert it to be compatible with setChar()
+	for(int i = (NUMDIGS - 1); i >= 0; i--) {
+		display_vars[i] = number_display % 10;
+		number_display /= 10;
+	}
+		//get index value and convert it to be compatible with setChar()
+	for(int i = 0; i < NUMVARS; i++) {
+		if(index_display == i) {
+			index_vars[i] = true;
+		} else {
 			index_vars[i] = false;
 		}
 	}
-
-		// returns the encoder value
-	int getEncoder() {
-		return readEncoderRelative();
+		// display numbers
+	for(int i = 0; i < ARRAY_SIZE; i++) {
+		disp.setChar(0, i, display_vars[i], index_vars[i]);
 	}
+}
 
-		// function for ISR
-	void buttonHandler() {
-		button_presses++;
-		last_event = millis();
-	}
+	// toggle relay to turn circulators on
+void IO::circOn() {
+	circ_state = true;
+	last_circ_action = millis();
+	digitalWrite(RELAY, HIGH);
+}
 
-		// returns the number of button presses since last call, clears button press variable
-	int getButtonPresses() {
-		int button_press_holder = button_presses;
-		button_presses = 0;
-		return button_press_holder;
-	}
+	// toggle relay to turn circulators off
+void IO::circOff() {
+	circ_state = false;
+	last_circ_action = millis();
+	digitalWrite(RELAY, LOW);
+}
 
-		// returns the thermistor reading in *F
-	int getTherm() {
-		float F = analogRead(THERM);
-		F = (RC * F) / (1023 - F);
-		F = log(F / R0);
-		F = 1 / (F / B + T0);
-		return round(F * 1.8 - 459.67);
-	}
+	// returns circulator state
+bool IO::getCircState() {
+	return circ_state;
+}
 
-		// returns millis() output of last input for timeout calculations
-	unsigned long getLastEvent() {
-		return last_event;
-	}
+	// returns millis() output of last circulator on/off call
+unsigned long IO::getLastCircAction() {
+	return last_circ_action;
+}
 
-		// display values when asked - receives the number to be displayed and the index
-	void output(int number_display, int index_display) {
-			// get display value and convert it to be compatible with setChar()
-		for(int i = (NUMDIGS - 1); i >= 0; i--) {
-			display_vars[i] = number_display % 10;
-			number_display /= 10;
-		}
-			//get index value and convert it to be compatible with setChar()
-		for(int i = 0; i < NUMVARS; i++) {
-			if(index_display == i) {
-				index_vars[i] = true;
-			} else {
-				index_vars[i] = false;
-			}
-		}
-			// display numbers
-		for(int i = 0; i < ARRAY_SIZE; i++) {
-			disp.setChar(0, i, display_vars[i], index_vars[i]);
-		}
-	}
+	// enable serial comms for debugging
+void IO::serialEnable() {
+	Serial.begin(BAUD);
+}
 
-		// toggle relay to turn circulators on
-	void circOn() {
-		circ_state = true;
-		last_circ_action = millis();
-		digitalWrite(RELAY, HIGH);
-	}
-
-		// toggle relay to turn circulators off
-	void circOff() {
-		circ_state = false;
-		last_circ_action = millis();
-		digitalWrite(RELAY, LOW);
-	}
-
-		// returns circulator state
-	bool getCircState() {
-		return circ_state;
-	}
-
-		// returns millis() output of last circulator on/off call
-	unsigned long getLastCircAction() {
-		return last_circ_action;
-	}
-
-		// enable serial comms for debugging
-	void serialEnable() {
-		Serial.begin(BAUD);
-	}
-
-		// make sure to call serialEnable first...
-	void serialWrite(String data) {
-		Serial.println(data);
-	}
-
-};
+	// make sure to call serialEnable first...
+void IO::serialWrite(String data) {
+	Serial.println(data);
+}
