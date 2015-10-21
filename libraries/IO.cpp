@@ -7,10 +7,9 @@
 #include "Encoder.h"
 #include "LedControl.h"
 
-	// constant definitions
+	// constant definitions - if NUMVARS or NUMDIGS change, be sure to update ARRAY_SIZE in IO.h as well
 #define NUMVARS 4			// number of LEDs in display (also how many index locations)
 #define NUMDIGS 3			// number of digits in display
-#define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
 #define NUMSAMPLES 16		// number of samples used in thermistor averaging
 #define BAUD 57600			// baud rate for serial debugging
 
@@ -35,21 +34,8 @@ LedControl disp = LedControl(LED_DAT, LED_CLK, LED_SEL, 1);
 	// define an encoder
 Encoder enc = Encoder(ENC1, ENC2);
 
-   	// return the relative encoder value since last read
-int IO::readEncoderRelative() {
-   	// this library registers 2 counts per "click", so adjust down to
-   	// one count per "click" for intuitiveness
-	old_enc_value = enc_value;
-	enc_value = (enc.read())/2;
-	if(enc_value - old_enc_value != 0) {
-		last_event = millis();
-	}
-	return enc_value - old_enc_value;
-}
-
 	// initialize IO values
 void IO::init() {
-
 		// initialize relay port
 	pinMode(RELAY, OUTPUT);
 
@@ -67,13 +53,20 @@ void IO::init() {
 
 	// returns the encoder value
 int IO::getEncoder() {
-	return readEncoderRelative();
+   	// this library registers 2 counts per "click", so adjust down to
+   	// one count per "click" for intuitiveness
+	old_enc_value = enc_value;
+	enc_value = (enc.read())/2;
+	if(enc_value - old_enc_value != 0) {
+		last_input_event = millis();
+	}
+	return enc_value - old_enc_value;
 }
 
 	// function for ISR
 void IO::buttonHandler() {
 	button_presses++;
-	last_event = millis();
+	last_input_event = millis();
 }
 
 	// returns the number of button presses since last call, clears button press variable
@@ -84,7 +77,7 @@ int IO::getButtonPresses() {
 }
 
 	// returns the thermistor reading in *F
-int IO::getTherm() {
+unsigned int IO::getTherm() {
 	float F = analogRead(THERM);
 	F = (RC * F) / (1023 - F);
 	F = log(F / R0);
@@ -93,8 +86,8 @@ int IO::getTherm() {
 }
 
 	// returns millis() output of last input for timeout calculations
-unsigned long IO::getLastEvent() {
-	return last_event;
+unsigned long IO::getLastInputEvent() {
+	return last_input_event;
 }
 
 	// display values when asked - receives the number to be displayed and the index
@@ -147,7 +140,7 @@ void IO::serialEnable() {
 	Serial.begin(BAUD);
 }
 
-	// make sure to call serialEnable first...
+	// make sure to call serialEnable first
 void IO::serialWrite(String data) {
 	Serial.println(data);
 }
