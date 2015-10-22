@@ -46,6 +46,7 @@ void IO::init() {
 		// initialize the encoder
 	enc.write(0);
 
+		// initialize display variables
 	for(int i = 0; i < ARRAY_SIZE; i++) {
 		display_vars[i] = ' ';
 		index_vars[i] = false;
