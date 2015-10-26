@@ -1,33 +1,9 @@
-/* This class serves as a one-stop-shop for all things world-related. Whether it be
- * reading a sensor or displaying some numbers, here's your guy!
- */
+/* This is the content for IO.h - see that file for a description of the class. */
 
 #include <Arduino.h>
 #include "IO.h"
 #include "Encoder.h"
 #include "LedControl.h"
-
-	// constant definitions - if NUMVARS or NUMDIGS change, be sure to update ARRAY_SIZE in IO.h as well
-#define NUMVARS 4			// number of LEDs in display (also how many index locations)
-#define NUMDIGS 3			// number of digits in display
-#define NUMSAMPLES 16		// number of samples used in thermistor averaging
-#define BAUD 57600			// baud rate for serial debugging
-#define DEBOUNCE_TIME 3		// ms pause to debounce button
-
-	// thermistor calculation definitions
-#define RC 3900
-#define T0 0.00335401643	// 1 / 298.15
-#define B 4500
-#define R0 50000
-
-	// pin definitions
-#define LED_DAT 8			// data to the LED driver chip
-#define LED_CLK 7			// clock to the LED driver chip
-#define LED_SEL 9			// selector lead to the LED driver chip
-#define ENC1 2				// first encoder pin
-#define ENC2 4				// second encoder pin
-#define RELAY 6				// relay pin
-#define THERM A0			// thermistor pin
 
 	// define an LED driver chip
 LedControl disp = LedControl(LED_DAT, LED_CLK, LED_SEL, 1);
@@ -41,28 +17,22 @@ void IO::init() {
 	pinMode(RELAY, OUTPUT);
 
 		// wake up display driver, set brightness, and clear
-	disp.shutdown(0, false); disp.setIntensity(0, 12); disp.clearDisplay(0);
+	disp.shutdown(0, false); disp.setIntensity(0, INTENSITY); disp.clearDisplay(0);
 
 		// initialize the encoder
 	enc.write(0);
-
-		// initialize display variables
-	for(int i = 0; i < ARRAY_SIZE; i++) {
-		display_vars[i] = ' ';
-		index_vars[i] = false;
-	}
 }
 
 	// returns the encoder value
 int IO::getEncoder() {
-   	// this library registers 2 counts per "click", so adjust down to
-   	// one count per "click" for intuitiveness
-	old_enc_value = enc_value;
+   		// this library registers 2 counts per "click", so adjust down to
+   		// one count per "click" for intuitiveness
 	enc_value = (enc.read())/2;
-	if(enc_value - old_enc_value != 0) {
+	if(enc_value != 0) {
 		last_input_event = millis();
+		enc.write(0);
 	}
-	return enc_value - old_enc_value;
+	return enc_value;
 }
 
 	// function for ISR - crudely debounced
@@ -75,9 +45,9 @@ void IO::buttonHandler() {
 
 	// returns the number of button presses since last call, clears button press variable
 int IO::getButtonPresses() {
-	int button_press_holder = button_presses;
+	int button_press_temp= button_presses;
 	button_presses = 0;
-	return button_press_holder;
+	return button_press_temp;
 }
 
 	// returns the thermistor reading in *F
@@ -94,7 +64,7 @@ unsigned long IO::getLastInputEvent() {
 	return last_input_event;
 }
 
-	// display values when asked - receives the number to be displayed and the index
+	// display values - receives the number to be displayed and the index
 void IO::output(int number_display, int index_display) {
 		// get display value and convert it to be compatible with setChar()
 	for(int i = (NUMDIGS - 1); i >= 0; i--) {
@@ -118,14 +88,14 @@ void IO::output(int number_display, int index_display) {
 	// toggle relay to turn circulators on
 void IO::circOn() {
 	circ_state = true;
-	last_circ_action = millis();
+	last_circ_event = millis();
 	digitalWrite(RELAY, HIGH);
 }
 
 	// toggle relay to turn circulators off
 void IO::circOff() {
 	circ_state = false;
-	last_circ_action = millis();
+	last_circ_event = millis();
 	digitalWrite(RELAY, LOW);
 }
 
@@ -136,15 +106,10 @@ bool IO::getCircState() {
 
 	// returns millis() output of last circulator on/off call
 unsigned long IO::getLastCircAction() {
-	return last_circ_action;
+	return last_circ_event;
 }
 
 	// enable serial comms for debugging
 void IO::serialEnable() {
 	Serial.begin(BAUD);
-}
-
-	// make sure to call serialEnable first
-void IO::serialWrite(String data) {
-	Serial.println(data);
 }

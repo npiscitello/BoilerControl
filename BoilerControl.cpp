@@ -42,9 +42,7 @@
 #define BUTTON 3					// encoder button pin
 
 	// constant definitions
-#define MAXDIG 9					// largest number for one displayed digit
-#define NUMDIGS 3					// number of digits in display
-#define NUMVARS 4					// number of LEDs in display (also how many index locations)
+#define MAXDIG 9					// largest allowable number for one digit
 #define TEMP_DELAY 125				// in ms - delay between thermistor readings
 #define OUTPUT_DELAY 50				// in ms - delay between display updates
 #define THRESH_DELAY 60000			// in ms - delay between threshold checks
