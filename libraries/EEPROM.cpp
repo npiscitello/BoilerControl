@@ -7,7 +7,7 @@ void EEPROM::init() {
 }
 
 	// write data to EEPROM memory - wear-leveling enabled
-void EEPROM::write() {
+void EEPROM::write(int circ_on, int circ_off, int thresh) {
 	// eventually take data and perform an update function -
 	// use update method and wear leveling
 }

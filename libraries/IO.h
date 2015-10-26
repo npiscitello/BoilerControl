@@ -10,7 +10,6 @@
 #define NUMDIGS 3			// number of digits in display
 #define ARRAY_SIZE 4		// takes the greater of NUMVARS or NUMDIGS to setup the display arrays
 #define BAUD 57600			// baud rate for serial debugging
-#define DEBOUNCE_TIME 3		// ms pause to debounce button
 #define INTENSITY 14		// intensity for LED driver - 0 to 16
 
 	// thermistor calculation definitions
@@ -31,19 +30,20 @@
 class IO {
 	private:
 			// define variables
-		int enc_value;					// current encoder value
-		volatile int button_presses;	// how many button presses since last call
-		unsigned long last_input_event;	// holds time of last input event (for timeout calculations)
-		unsigned long last_circ_event;	// holds time of last circulator on/off call
-		bool circ_state;				// holds on(true)/off(false) state of circulator
-		char display_vars[ARRAY_SIZE];  // display digits
-		bool index_vars[ARRAY_SIZE];	// variable indicator display values
+		int enc_value;						// current encoder value
+		unsigned long last_input_event;		// holds time of last input event (for timeout calculations)
+		unsigned long last_button_event;	// holds time of last button event
+		unsigned long last_circ_event;		// holds time of last circulator on/off call
+		bool circ_state;					// holds on(true)/off(false) state of circulator
+		char display_vars[ARRAY_SIZE];  	// display digits
+		bool index_vars[ARRAY_SIZE];		// variable indicator display values
+		bool led_state;						// store on/off state of LED driver
 
 	public:
 		void init();										// initializes functions
 		int getEncoder();									// returns the relative encoder read since last call
 		void buttonHandler();								// responds to button ISR
-		int getButtonPresses();								// returns number of button presses since last read
+		unsigned long getLastButtonEvent();					// returns last button event
 		unsigned int getTherm();							// returns thermistor reading in *F
 		unsigned long getLastInputEvent();					// returns millis() output of last input for timeout calculations
 		void output(int number_display, int index_display);	// outputs to LEDs and display
@@ -52,6 +52,8 @@ class IO {
 		bool getCircState();								// returns circulator state
 		unsigned long getLastCircAction();					// returns millis() output of last circulator on/off call
 		void serialEnable();								// enables serial comms
+		bool getLEDState();									// get the on/off state of LED chip
+		void setLEDState(bool enabled);						// set the on/off state of LED chip
 };
 
 #endif

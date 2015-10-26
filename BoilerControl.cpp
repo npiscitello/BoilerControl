@@ -47,6 +47,9 @@
 #define OUTPUT_DELAY 50				// in ms - delay between display updates
 #define THRESH_DELAY 60000			// in ms - delay between threshold checks
 #define TIMEOUT 10000				// in ms - delay before display returns to temperature
+#define HOLD_DELAY 3000				// in ms - how long the button must be held down to save values to EEPROM
+#define FLASH_DELAY 250				// in ms - time between on/off in LED flash
+#define TIME_THRESH 1				// in ms - fudge value to make periodic tasks more regular
 #define ON_OFF_CONV 60000			// conversion factor for ON and OFF variables to use in circulator
 									// timing - converts display units to ms (currently minutes -> ms)
 #define ALPHA 0.1					// alpha value for averaging function
@@ -60,17 +63,22 @@
 
 	// variable declarations
 unsigned int variables[NUMVARS];	// holds current temperature, on and off times, threshold
-unsigned int index;					// holds current selection in variable array
+unsigned int index = 0;				// holds current selection in variable array
 bool above_thresh;					// holds the state of stove temperature comparison
+int button_var;						// tells the code about the button state
 int encoder;						// holds current encoder reading
 
 	// instantiate classes
 EEPROM memory;
 IO inout;
 
-// button ISR
-void buttonISR() {
-inout.buttonHandler();
+void buttonPressISR() {
+	if(digitalRead(BUTTON) == HIGH) {
+		button_var = 'r';
+	} else {
+		button_var = 'p';
+		inout.buttonHandler();
+	}
 }
 
 void setup() {
@@ -80,7 +88,7 @@ void setup() {
 
 		// initialize button - not in IO because interrupt requires it to be in main loop
 	pinMode(BUTTON, INPUT_PULLUP);
-	attachInterrupt(digitalPinToInterrupt(BUTTON), buttonISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(BUTTON), buttonPressISR, CHANGE);
 
 		// get variables from EEPROM
 	//variables = memory.read();	// make sure to update read function so it returns this type
@@ -91,10 +99,24 @@ void setup() {
 }
 
 void loop() {
-		// manage index value
-	index += inout.getButtonPresses();
-	if(index > NUMVARS - 1) {
-		index -= NUMVARS;
+		// deal with button stuff
+	if(button_var == 'p') {
+		if(millis() - inout.getLastButtonEvent() >= HOLD_DELAY) {
+			if(millis() % FLASH_DELAY <= TIME_THRESH) {
+				inout.setLEDState(!inout.getLEDState());
+			}
+		}
+	} else if(button_var == 'r') {
+		button_var = 'n';
+		if(millis() - inout.getLastButtonEvent() >= HOLD_DELAY) {
+			// save values
+			inout.setLEDState(true);
+		} else {
+			index ++;
+			if(index > NUMVARS - 1) {
+				index -= NUMVARS;
+			}
+		}
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
@@ -113,7 +135,7 @@ void loop() {
 		// update temperature value every so often - using an exponential moving average to smooth the output
 		// don't need to check for rolling over the variable because the board won't be active if the temperature is negative
 		// adjust for upper display limit
-	if(millis() % TEMP_DELAY == 0) {
+	if(millis() % TEMP_DELAY <= TIME_THRESH) {
 		variables[TEMP_VAR] = (ALPHA * inout.getTherm()) + ONE_MIN_ALPHA * variables[TEMP_VAR];
 		if(variables[TEMP_VAR] > MAXNUM) {
 			variables[TEMP_VAR] = MAXNUM;
@@ -121,7 +143,7 @@ void loop() {
 	}
 
 		// check threshold every so often - compare delay prevents bouncing
-	if(millis() % THRESH_DELAY == 0) {
+	if(millis() % THRESH_DELAY <= TIME_THRESH) {
 		if(variables[TEMP_VAR] > variables[THRESH_VAR]) {
 			above_thresh = true;
 		} else {
@@ -138,10 +160,12 @@ void loop() {
 		} else if(!inout.getCircState() && (millis() - inout.getLastCircAction()) >= (variables[OFF_VAR] * (unsigned long)ON_OFF_CONV)) {
 			inout.circOn();
 		}
+	} else {
+		inout.circOff();
 	}
 
 		// update display every so often
-	if(millis() % OUTPUT_DELAY == 0) {
+	if(millis() % OUTPUT_DELAY <= TIME_THRESH) {
 		inout.output(variables[index], index);
 	}
 }

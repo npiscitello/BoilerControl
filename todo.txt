@@ -19,6 +19,11 @@
 * WHEN newly structured code works, implement EEPROM save/restore
 	* implement wear-leveling for every new value save; shouldn't be a lot of writing, but there's no reason
 		to put more wear on a sector than necessary
+		
+IO behaivior - 
+	- button press: change index
+	- button long press: save to EEPROM
+	- encoder twist: change variable
 
 
 

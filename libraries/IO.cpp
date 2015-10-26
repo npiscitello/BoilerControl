@@ -16,8 +16,10 @@ void IO::init() {
 		// initialize relay port
 	pinMode(RELAY, OUTPUT);
 
-		// wake up display driver, set brightness, and clear
-	disp.shutdown(0, false); disp.setIntensity(0, INTENSITY); disp.clearDisplay(0);
+		// enable the display
+	disp.setIntensity(0, INTENSITY);
+	disp.clearDisplay(0);
+	setLEDState(true);
 
 		// initialize the encoder
 	enc.write(0);
@@ -35,19 +37,14 @@ int IO::getEncoder() {
 	return enc_value;
 }
 
-	// function for ISR - crudely debounced
+	// function for ISR
 void IO::buttonHandler() {
-	if(millis() - last_input_event >= DEBOUNCE_TIME) {
-		button_presses++;
-	}
-	last_input_event = millis();
+	last_input_event = last_button_event = millis();
 }
 
 	// returns the number of button presses since last call, clears button press variable
-int IO::getButtonPresses() {
-	int button_press_temp= button_presses;
-	button_presses = 0;
-	return button_press_temp;
+unsigned long IO::getLastButtonEvent() {
+	return last_button_event;
 }
 
 	// returns the thermistor reading in *F
@@ -112,4 +109,15 @@ unsigned long IO::getLastCircAction() {
 	// enable serial comms for debugging
 void IO::serialEnable() {
 	Serial.begin(BAUD);
+}
+
+	// turn the LED driver chip on
+bool IO::getLEDState() {
+	return led_state;
+}
+
+ // turn the LED driver chip off
+void IO::setLEDState(bool state) {
+	led_state = state;
+	disp.shutdown(0, !state);
 }
