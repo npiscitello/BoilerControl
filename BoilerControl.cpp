@@ -42,7 +42,7 @@
 #define BUTTON 3					// encoder button pin
 
 	// constant definitions
-#define MAXDIG 9					// largest allowable number for one digit
+#define MAXNUM 999					// largest displayable number
 #define TEMP_DELAY 125				// in ms - delay between thermistor readings
 #define OUTPUT_DELAY 50				// in ms - delay between display updates
 #define THRESH_DELAY 60000			// in ms - delay between threshold checks
@@ -98,15 +98,11 @@ void loop() {
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
-		// test lower limit to ensure that the unsigned int doesn't roll over
+		// and test limits (0-255, to fit in one byte to facilitate EEPROM storage)
 	encoder = inout.getEncoder();
-	if(index != TEMP_VAR && (variables[index] > 0 || (variables[index] == 0 && encoder >= 0))) {
+	if(index != TEMP_VAR && ((variables[index] > 0 && variables[index] < 255) ||\
+			(variables[index] == 0 && encoder >= 0) || (variables[index] == 255 && encoder <= 0))) {
 		variables[index] += encoder;
-	}
-
-		// handle upper limit - in base MAXDIG + 1
-	if(variables[index] > (pow(MAXDIG + 1, NUMDIGS) - 1)) {
-		variables[index] = (pow(MAXDIG + 1, NUMDIGS) - 1);
 	}
 
 		// return to temperature display if nothing has happened in TIMEOUT ms
@@ -116,8 +112,12 @@ void loop() {
 
 		// update temperature value every so often - using an exponential moving average to smooth the output
 		// don't need to check for rolling over the variable because the board won't be active if the temperature is negative
+		// adjust for upper display limit
 	if(millis() % TEMP_DELAY == 0) {
 		variables[TEMP_VAR] = (ALPHA * inout.getTherm()) + ONE_MIN_ALPHA * variables[TEMP_VAR];
+		if(variables[TEMP_VAR] > MAXNUM) {
+			variables[TEMP_VAR] = MAXNUM;
+		}
 	}
 
 		// check threshold every so often - compare delay prevents bouncing

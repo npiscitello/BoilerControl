@@ -6,7 +6,7 @@ void EEPROM::init() {
 	// probably initialize locations,etc.
 }
 
-	// write data to EEPROM memory - wear-levelling enabled
+	// write data to EEPROM memory - wear-leveling enabled
 void EEPROM::write() {
 	// eventually take data and perform an update function -
 	// use update method and wear leveling
