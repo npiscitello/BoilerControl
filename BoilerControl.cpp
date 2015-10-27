@@ -52,7 +52,7 @@
 #define TIME_THRESH 1				// in ms - fudge value to make periodic tasks more regular
 #define ON_OFF_CONV 60000			// conversion factor for ON and OFF variables to use in circulator
 									// timing - converts display units to ms (currently minutes -> ms)
-#define ALPHA 0.1					// alpha value for averaging function
+#define ALPHA 0.1					// alpha value for averaging function - decrease for smoother operation
 #define ONE_MIN_ALPHA 0.9			// 1 - alpha value for averaging function
 
 	// index values for data variables
@@ -63,7 +63,7 @@
 
 	// variable declarations
 unsigned int variables[NUMVARS];	// holds current temperature, on and off times, threshold
-unsigned int index = 0;				// holds current selection in variable array
+unsigned int index;					// holds current selection in variable array
 bool above_thresh;					// holds the state of stove temperature comparison
 int button_var;						// tells the code about the button state
 int encoder;						// holds current encoder reading
@@ -96,6 +96,10 @@ void setup() {
 		// eventually, retrieve variables from memory - for now, just default
 	variables[THRESH_VAR] = 50;
 	variables[ON_VAR] = 1; variables[OFF_VAR] = 2;
+
+		// initialize variables
+	index = 0;
+	button_var = 'n';
 }
 
 void loop() {

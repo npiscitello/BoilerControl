@@ -13,6 +13,9 @@ Encoder enc = Encoder(ENC1, ENC2);
 
 	// initialize IO values
 void IO::init() {
+		// initialize thermistor port
+	pinMode(THERM, INPUT);
+
 		// initialize relay port
 	pinMode(RELAY, OUTPUT);
 
@@ -50,10 +53,11 @@ unsigned long IO::getLastButtonEvent() {
 	// returns the thermistor reading in *F
 unsigned int IO::getTherm() {
 	float F = analogRead(THERM);
-	F = (RC * F) / (1023 - F);
-	F = log(F / R0);
-	F = 1 / (F / B + T0);
-	return round(F * 1.8 - 459.67);
+	F = RC / ((1023 / F) - 1);		// convert to resistance
+	F = log(F / R0) / B;			// ln(R/R0) / B
+	F += T0;						// + (1/T0)
+	F = (1/F);						// invert to get *K
+	return 1.8*(F - 273.15) + 32;	// convert to *F
 }
 
 	// returns millis() output of last input for timeout calculations
