@@ -34,8 +34,8 @@
  *   \__________________________________________________________________/   *
  *   																		*/
 
-#include "Arduino.h"
-#include "EEPROM.h"
+#include <Arduino.h>
+#include "STORAGE.h"
 #include "IO.h"
 
 	// pin definitions
@@ -69,7 +69,7 @@ int button_var;						// tells the code about the button state
 int encoder;						// holds current encoder reading
 
 	// instantiate classes
-EEPROM memory;
+STORAGE memory;
 IO inout;
 
 void buttonPressISR() {
@@ -90,12 +90,10 @@ void setup() {
 	pinMode(BUTTON, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(BUTTON), buttonPressISR, CHANGE);
 
-		// get variables from EEPROM
-	//variables = memory.read();	// make sure to update read function so it returns this type
-
-		// eventually, retrieve variables from memory - for now, just default
-	variables[THRESH_VAR] = 50;
-	variables[ON_VAR] = 1; variables[OFF_VAR] = 2;
+		// retrieve variables from memory
+	variables[THRESH_VAR] = memory.readThresh();
+	variables[ON_VAR] = memory.readCircOn();
+	variables[OFF_VAR] = memory.readCircOff();
 
 		// initialize variables
 	index = 0;
@@ -124,10 +122,10 @@ void loop() {
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
-		// and test limits (0-255, to fit in one byte to facilitate EEPROM storage)
+		// and test limits (1-255, to fit in one byte to facilitate EEPROM storage)
 	encoder = inout.getEncoder();
-	if(index != TEMP_VAR && ((variables[index] > 0 && variables[index] < 255) ||\
-			(variables[index] == 0 && encoder >= 0) || (variables[index] == 255 && encoder <= 0))) {
+	if(index != TEMP_VAR && ((variables[index] > 1 && variables[index] < 255) ||\
+			(variables[index] == 1 && encoder >= 1) || (variables[index] == 255 && encoder <= 1))) {
 		variables[index] += encoder;
 	}
 
