@@ -52,8 +52,8 @@
 #define TIME_THRESH 1				// in ms - fudge value to make periodic tasks more regular
 #define ON_OFF_CONV 60000			// conversion factor for ON and OFF variables to use in circulator
 									// timing - converts display units to ms (currently minutes -> ms)
-#define ALPHA 0.1					// alpha value for averaging function - decrease for smoother operation
-#define ONE_MIN_ALPHA 0.9			// 1 - alpha value for averaging function
+#define ALPHA 0.075					// alpha value for averaging function - decrease for smoother operation
+#define ONE_MIN_ALPHA 0.925			// 1 - alpha value for averaging function
 
 	// index values for data variables
 #define TEMP_VAR 0					// thermistor variable index location
@@ -111,7 +111,7 @@ void loop() {
 	} else if(button_var == 'r') {
 		button_var = 'n';
 		if(millis() - inout.getLastButtonEvent() >= HOLD_DELAY) {
-			// save values
+			memory.write(variables[ON_VAR], variables[OFF_VAR], variables[THRESH_VAR]);
 			inout.setLEDState(true);
 		} else {
 			index ++;

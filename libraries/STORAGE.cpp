@@ -11,10 +11,16 @@ void STORAGE::init() {
 	// finds the index of the data using passid, etc.  See EEPROM.h
 void STORAGE::findIndexes() {
 	passid = EEPROM.read(0);
-	for(int i = NUMVARS; i < EEPROM_BYTES; i += NUMVARS) {
-		if(EEPROM.read(i) != passid) {
-			passid_addr = i-NUMVARS;
-			break;
+		// handle the special case that the last write was to the last 4 bytes...
+	if(EEPROM.read(EEPROM_BYTES - 4) == passid) {
+		passid_addr = EEPROM_BYTES - 4;
+	} else {
+			// find the last place to which the data was written
+		for(int i = NUMVARS; i < EEPROM_BYTES; i += NUMVARS) {
+			if(EEPROM.read(i) != passid) {
+				passid_addr = i-NUMVARS;
+				break;
+			}
 		}
 	}
 }
