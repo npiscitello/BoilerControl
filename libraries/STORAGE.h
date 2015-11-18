@@ -1,23 +1,21 @@
 #ifndef __E_h
 #define __E_h
 
+#define EEPROM_BYTES 1024	// number of bytes in the EEPROM
+#define NUMVARS 4			// number of variables to store
+
 class STORAGE {
 	private:
-		int passid;			// value of current passid
-		int passid_addr;	// memory address of passid value
-		int circon_addr;	// memory address of circon value
-		int circoff_addr;	// memory address of circoff value
-		int thresh_addr;	// memory address of thresh value
+		byte passid;							// value of current passid
+		int passid_addr;						// memory address of passid value
+		void findIndexes();						// find the index of the next 3 empty bytes
 
 	public:
-		void init();						// initialize EEPROM memory
-		int findNextIndex();				// find the index of the next 3 empty bytes
-		void writeCircOn(int circ_on);		// write data to EEPROM memory - wear leveling enabled
-		void writeCircOff(int circ_off);	// write data to EEPROM memory - wear leveling enabled
-		void writeThresh(int thresh);		// write data to EEPROM memory - wear leveling enabled
-		int readCircOn();					// read data from EEPROM memory
-		int readCircOff();					// read data from EEPROM memory
-		int readThresh();					// read data from EEPROM memory
+		void init();										// initialize EEPROM memory
+		void write(byte circon, byte circoff, byte thresh);	// writes to EEPROM, with wear leveling
+		int readCircOn();									// read data from EEPROM memory
+		int readCircOff();									// read data from EEPROM memory
+		int readThresh();									// read data from EEPROM memory
 };
 
 #endif
@@ -30,6 +28,7 @@ class STORAGE {
 //						|	   |	  |		   |		|		 |		  |		 |		|
 // EEPROM mem layout:  	| junk | junk | passid | circon | circoff| thresh | junk | junk |
 //						|	   |	  |		   |		|		 |		  |		 |		|
+
 // passid - a unique identifier used to determine which memory pass the wear leveling
 // algorithm is on.  1st pass is 1, 2nd is 2, etc. to 255. When pass 255 loops back to zero,
 // it resets the current passid to 1.  When the wear leveling function starts looking for the

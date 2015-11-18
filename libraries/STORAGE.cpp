@@ -4,41 +4,50 @@
 
 	// initialize EEPROM memory
 void STORAGE::init() {
-	// probably initialize locations,etc.
+		// find the last written set of data
+	findIndexes();
 }
 
 	// finds the index of the data using passid, etc.  See EEPROM.h
-int STORAGE::findNextIndex() {
+void STORAGE::findIndexes() {
 	passid = EEPROM.read(0);
-	return 0;
+	for(int i = NUMVARS; i < EEPROM_BYTES; i += NUMVARS) {
+		if(EEPROM.read(i) != passid) {
+			passid_addr = i-NUMVARS;
+			break;
+		}
+	}
 }
 
-	// write data to EEPROM memory - wear leveling enabled
-void STORAGE::writeCircOn(int circ_on) {
-
-}
-
-	// write data to EEPROM memory - wear leveling enabled
-void STORAGE::writeCircOff(int circ_off) {
-
-}
-
-	// write data to EEPROM memory - wear leveling enabled
-void STORAGE::writeThresh(int thresh) {
-
+	// writes the number to the specified address
+void STORAGE::write(byte circ_on, byte circ_off, byte thresh) {
+		// if advancing NUMVARS bytes overflows the EEPROM...
+	if(passid_addr + NUMVARS == EEPROM_BYTES) {
+			// ...reset to the beginning and increment passid
+		passid_addr -=  EEPROM_BYTES - NUMVARS;
+			// if passid overflows a byte...
+		passid ++;
+		if(passid == 0) {
+			passid = 1;
+		}
+	} else {
+		passid_addr += NUMVARS;
+	}
+	EEPROM.update(passid_addr, passid);   EEPROM.update(passid_addr + 1, circ_on);
+	EEPROM.update(passid_addr + 2, circ_off);   EEPROM.update(passid_addr + 3, thresh);
 }
 
 	// read data from EEPROM memory
 int STORAGE::readCircOn() {
-	return 1;
+	return EEPROM.read(passid_addr + 1);
 }
 
 	// read data from EEPROM memory
 int STORAGE::readCircOff() {
-	return 2;
+	return EEPROM.read(passid_addr + 2);
 }
 
 	// read data from EEPROM memory
 int STORAGE::readThresh() {
-	return 50;
+	return EEPROM.read(passid_addr + 3);
 }
