@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "STORAGE.h"
-#include <EEPROM.h>
+#include "EEPROM.h"
 
 	// initialize EEPROM memory
 void STORAGE::init() {

@@ -37,8 +37,8 @@
  *   																		*/
 
 #include <Arduino.h>
-#include "STORAGE.h"
-#include "IO.h"
+#include "libraries/STORAGE.h"
+#include "libraries/IO.h"
 
 	// pin definitions
 #define BUTTON 3					// encoder button pin
