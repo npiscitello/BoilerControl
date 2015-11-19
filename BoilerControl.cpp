@@ -8,8 +8,10 @@
  * (      - LedControl library: https://github.com/wayoda/LedControl      ) *
  *  )	  - Encoder library:                                             (  *
  * (             http://www.pjrc.com/teensy/td_libs_Encoder.html          ) *
- *  )     - IO library - custom written for application                  (
- * (      - EEPROM library - custom written for application               )
+ *  )     - IO library - custom written for application                  (	*
+ * (      - MEMORY library - custom written for application               )	*
+ * 	)	  - EEPROM library: included with Arduino IDE usually,			 (	*
+ * 	(       	included for ease of use								  )	*
  *  )                                                                    (  *
  * (    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    ) *
  *  )                                                                    (  *
@@ -101,7 +103,9 @@ void setup() {
 }
 
 void loop() {
-		// deal with button stuff
+		// deal with button stuff - if down , time how long it's been down for
+		// to deal with flashing.  After it's released, see how long it was pressed
+		// to determine whether to increment the index or save values
 	if(button_var == 'p') {
 		if(millis() - inout.getLastButtonEvent() >= HOLD_DELAY) {
 			if(millis() % FLASH_DELAY <= TIME_THRESH) {
@@ -111,7 +115,7 @@ void loop() {
 	} else if(button_var == 'r') {
 		button_var = 'n';
 		if(millis() - inout.getLastButtonEvent() >= HOLD_DELAY) {
-			memory.write(variables[ON_VAR], variables[OFF_VAR], variables[THRESH_VAR]);
+			memory.write((byte) variables[ON_VAR], (byte) variables[OFF_VAR], (byte) variables[THRESH_VAR]);
 			inout.setLEDState(true);
 		} else {
 			index ++;
@@ -122,10 +126,10 @@ void loop() {
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
-		// and test limits (1-255, to fit in one byte to facilitate EEPROM storage)
+		// and test limits (0-255, to fit in one byte to facilitate EEPROM storage)
 	encoder = inout.getEncoder();
-	if(index != TEMP_VAR && ((variables[index] > 1 && variables[index] < 255) ||\
-			(variables[index] == 1 && encoder >= 1) || (variables[index] == 255 && encoder <= 1))) {
+	if(index != TEMP_VAR && ((variables[index] > 0 && variables[index] < 255) ||\
+			(variables[index] == 0 && encoder >= 1) || (variables[index] == 255 && encoder <= 0))) {
 		variables[index] += encoder;
 	}
 
