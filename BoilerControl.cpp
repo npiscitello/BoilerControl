@@ -74,6 +74,7 @@ int encoder;						// holds current encoder reading
 STORAGE memory;
 IO inout;
 
+	// deal with button presses - call different things based on if it was a press or release
 void buttonPressISR() {
 	if(digitalRead(BUTTON) == HIGH) {
 		button_var = 'r';
@@ -126,7 +127,7 @@ void loop() {
 	}
 
 		// manage encoder input - read every loop to prevent accumulation during temperature display
-		// and test limits (0-255, to fit in one byte to facilitate EEPROM storage)
+		// and enforce limits (0-255, to fit in one byte to facilitate EEPROM storage)
 	encoder = inout.getEncoder();
 	if(index != TEMP_VAR && ((variables[index] > 0 && variables[index] < 255) ||\
 			(variables[index] == 0 && encoder >= 1) || (variables[index] == 255 && encoder <= 0))) {

@@ -1,3 +1,7 @@
+/* This class serves as
+ *
+ */
+
 #ifndef __E_h
 #define __E_h
 

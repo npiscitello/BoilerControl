@@ -31,9 +31,9 @@ void STORAGE::write(byte circ_on, byte circ_off, byte thresh) {
 	if(passid_addr + NUMVARS == EEPROM_BYTES) {
 			// ...reset to the beginning and increment passid
 		passid_addr -=  EEPROM_BYTES - NUMVARS;
-			// if passid overflows a byte...
+			// if passid overflows a byte, reset to 1
 		passid ++;
-		if(passid == 0) {
+		if(passid == 255) {
 			passid = 1;
 		}
 	} else {
