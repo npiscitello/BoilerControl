@@ -23,8 +23,10 @@
 #define MAX_DISPLAY_TEST  0x0F
 // offset to the first digit reg, to take advantage of contiguousness
 #define MAX_DIG_OFFSET    MAX_D0
+// Most significant digit
 #define MAX_DIG_FIRST     0
-#define MAX_DIG_LAST      7
+// Least significant digit (ones place)
+#define MAX_DIG_LAST      2
 
 // MAX72XX convenient values
 #define MAX_SLEEP   0x00
@@ -32,14 +34,40 @@
 #define MAX_RAW     0x00
 #define MAX_CODEB   0xFF
 #define MAX_SCAN3   0x02
+#define MAX_BIGNUM  999
 
-// write out a three-digit integer
+// ten to a power (won't need anything over 100, so it uses 8 bit nums)
+// the case structure is less extensible, but the scope of this function is tiny and it's faster to
+// write and easier to read than recursive multiplication
+uint8_t _pow_10(uint8_t power) {
+  switch( power ) {
+    default:  // intentional fall-through
+    case 0:
+      return 1;
+    case 1:
+      return 10;
+    case 2:
+      return 100;
+  }
+}
+
+// write out a three-digit integer. We'll never need decimal points.
+// This prints the hundereds place in index 0 and the ones place in index 2.
+// leading zeroes are preserved
 void led_disp(uint16_t num) {
+  if( num <= MAX_BIGNUM ) {
+    // iterate from most significant to least significant digit
+    for( uint8_t i = MAX_DIG_FIRST; i <= MAX_DIG_LAST; i++ ) {
+      uint8_t dig = num - num % _pow_10(MAX_DIG_LAST - i);
+      num -= dig;
+      led_print(dig, i);
+    }
+  }
   return;
 }
 
 // write a digit to a specific SSD
-void led_print(uint8_t digit, uint8_t index) {
+void led_print(const uint8_t digit, const uint8_t index) {
   if( index >= MAX_DIG_FIRST && index <= MAX_DIG_LAST ) {
     led_transmit(MAX_DIG_OFFSET + index, digit);
   }
@@ -47,7 +75,7 @@ void led_print(uint8_t digit, uint8_t index) {
 }
 
 // enable/disable MAX72XX sleep mode
-void led_sleep(bool sleep) {
+void led_sleep(const bool sleep) {
   if( sleep ) {
     led_transmit(MAX_SHUTDOWN, MAX_SLEEP);
   } else {
@@ -78,7 +106,7 @@ void led_setup() {
 }
 
 // write a word to a MAX72XX reg
-void led_transmit(uint8_t reg, uint8_t val) {
+void led_transmit(const uint8_t reg, const uint8_t val) {
   // set CS low
   CS_PORT &= 0xFF & !_BV(CS_PIN);
   // what register to write on the MAX7221

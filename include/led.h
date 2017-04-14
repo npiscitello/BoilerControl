@@ -16,12 +16,12 @@ void led_disp(uint16_t num);
  *  @index the SSD to print onto, range-checked (0-7)
  *  There is no range checking. The four LSBs define the character to print (in order: 0-9,
  *  <dash>, E, H, L, P, <blank>) and the MSB controls the decimal point. */
-void led_print(uint8_t digit, uint8_t index);
+void led_print(const uint8_t digit, const uint8_t index);
 
 //- bool takes a full byte - turn into a global bitfield if the space is critical
 /*  Toggle MAX72XX sleep mode
  *  @sleep send the sleep (true) or wake (false) command */
-void led_sleep(bool sleep);
+void led_sleep(const bool sleep);
 
 /*  Setup hardware SPI and MAX72XX*/
 void led_setup();
@@ -29,6 +29,6 @@ void led_setup();
 /*  Write a MAX72XX reg
  *  @reg which register on the MAX to write
  *  @val the value to write to the register */
-void led_transmit(uint8_t reg, uint8_t val);
+void led_transmit(const uint8_t reg, const uint8_t val);
 
 #endif
