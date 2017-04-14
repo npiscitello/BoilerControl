@@ -36,31 +36,14 @@
 #define MAX_SCAN3   0x02
 #define MAX_BIGNUM  999
 
-// ten to a power (won't need anything over 100, so it uses 8 bit nums)
-// the case structure is less extensible, but the scope of this function is tiny and it's faster to
-// write and easier to read than recursive multiplication
-uint8_t _pow_10(uint8_t power) {
-  switch( power ) {
-    default:  // intentional fall-through
-    case 0:
-      return 1;
-    case 1:
-      return 10;
-    case 2:
-      return 100;
-  }
-}
-
 // write out a three-digit integer. We'll never need decimal points.
 // This prints the hundereds place in index 0 and the ones place in index 2.
 // leading zeroes are preserved
 void led_disp(uint16_t num) {
   if( num <= MAX_BIGNUM ) {
-    // iterate from most significant to least significant digit
-    for( uint8_t i = MAX_DIG_FIRST; i <= MAX_DIG_LAST; i++ ) {
-      uint8_t dig = num - num % _pow_10(MAX_DIG_LAST - i);
-      num -= dig;
-      led_print(dig, i);
+    for( uint8_t i = MAX_DIG_LAST; i >= MAX_DIG_FIRST; i-- ) {
+      led_print(num % 10, i);
+      num /= 10;
     }
   }
   return;
