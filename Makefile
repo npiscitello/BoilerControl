@@ -82,7 +82,8 @@ OBJDIR = .
 # List C source files here. (C dependencies are automatically generated.)
 # There's a fancy way to get the include sources automagically, but this is easier
 SRC = $(TARGET).c \
-			include/led.c
+			include/led.c \
+			include/enc.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

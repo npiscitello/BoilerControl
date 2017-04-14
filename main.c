@@ -9,7 +9,7 @@ int main(void) {
   led_setup();
 
   // run loop
-  while(true) {
+  while(1==1) {
     // do stuff in here
   }
 
