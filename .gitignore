@@ -1,7 +1,3 @@
-/.settings/
-/arduino/
-/Release/
-/.cproject
-/.project
-/spec.d
-/.ino.cpp
+*.swp
+*.pyc
+*.o
