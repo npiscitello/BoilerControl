@@ -1,8 +1,8 @@
 // Comments written for use with cldoc (https://jessevdk.github.io/cldoc/)
 // Encoder/button driver - sets up interrupts and defines ISRs
 
-#ifndef LED_H
-#define LED_H
+#ifndef ENC_H
+#define ENC_H
 
 #include <stdint.h>
 

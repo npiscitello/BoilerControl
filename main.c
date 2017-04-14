@@ -3,10 +3,12 @@
 // system clock: 8MHz / 8 = 1MHz */
 
 #include "include/led.h"
+#include "include/enc.h"
 
 int main(void) {
   // setup
   led_setup();
+  enc_setup();
 
   // run loop
   while(1==1) {
