@@ -58,4 +58,23 @@ ISR(INT0_vect) {
 ISR(INT1_vect) {
   // CW:  B falls + A low or B rises and A high
   // CCW: B falls + A high or B rises and A low
+  if( ENC_IN_REG & (0x00 | _BV(ENC_IN_B)) ) {
+    // B rose...
+    if( ENC_IN_REG & (0x00 | _BV(ENC_IN_A)) ) {
+      // ...and A is high - clockwise
+      enc_val++;
+    } else {
+      // ...and A is low - counterclockwise
+      enc_val--;
+    }
+  } else {
+    // B fell...
+    if( ENC_IN_REG & (0x00 | _BV(ENC_IN_A)) ) {
+      // ...and A is high - counterclockwise
+      enc_val--;
+    } else {
+      // ...and A is low - clockwise
+      enc_val++;
+    }
+  }
 }
