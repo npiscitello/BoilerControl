@@ -8,6 +8,8 @@
 
 void enc_setup(void);
 
-uint8_t enc_read(void);
+int8_t enc_read(void);
+
+uint8_t enc_index(void);
 
 #endif

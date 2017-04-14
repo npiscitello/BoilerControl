@@ -26,7 +26,12 @@
 
 // holds the number of encoder clicks since last read (can be pos or neg)
 // if overflows are a problem, change to 16 bit
-volatile int8_t enc_val;
+volatile int8_t enc_val = 0;
+
+// holds the index and bounds
+#define ENC_MIN_INDEX   0
+#define ENC_MAX_INDEX   3
+volatile uint8_t enc_index_val = 0;
 
 void enc_setup(void) {
   // enable input with pullups on required pins with nop for sync
@@ -38,8 +43,8 @@ void enc_setup(void) {
   return;
 }
 
-uint8_t enc_read(void) {
-  uint8_t retval;
+int8_t enc_read(void) {
+  int8_t retval;
   // make sure the encoder value doesn't change when we're RMWing
   // (YCM, if you have it, will probably complain about an unused var. Ignore it.)
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
@@ -49,9 +54,24 @@ uint8_t enc_read(void) {
   return retval;
 }
 
+uint8_t enc_index(void) {
+  uint8_t retval;
+  // make sure the index doesn't change when we're reading it
+  // (YCM, if you have it, will probably complain about an unused var. Ignore it.)
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    retval = enc_index_val;
+  }
+  return retval;
+}
+
 // button on pin 4
 ISR(INT0_vect) {
-  // stuff
+  // increment index with rollover
+  if( enc_index_val < ENC_MAX_INDEX ) {
+    enc_index_val++;
+  } else {
+    enc_index_val = ENC_MIN_INDEX;
+  }
 }
 
 // encoder on pins 5 (B) and 6 (A)
