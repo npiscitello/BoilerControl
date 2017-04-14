@@ -39,30 +39,14 @@
 // write out a three-digit integer. We'll never need decimal points.
 // This prints the hundereds place in index 0 and the ones place in index 2.
 // leading zeroes are preserved
+// In the actual transmit function, the four LSBs define the character to print (in order: 0-9,
+// <dash>, E, H, L, P, <blank>) and the MSB controls the decimal point.
 void led_disp(uint16_t num) {
   if( num <= MAX_BIGNUM ) {
     for( uint8_t i = MAX_DIG_LAST; i >= MAX_DIG_FIRST; i-- ) {
-      led_print(num % 10, i);
+      led_transmit(MAX_DIG_OFFSET + i, num % 10);
       num /= 10;
     }
-  }
-  return;
-}
-
-// write a digit to a specific SSD
-void led_print(const uint8_t digit, const uint8_t index) {
-  if( index >= MAX_DIG_FIRST && index <= MAX_DIG_LAST ) {
-    led_transmit(MAX_DIG_OFFSET + index, digit);
-  }
-  return;
-}
-
-// enable/disable MAX72XX sleep mode
-void led_sleep(const bool sleep) {
-  if( sleep ) {
-    led_transmit(MAX_SHUTDOWN, MAX_SLEEP);
-  } else {
-    led_transmit(MAX_SHUTDOWN, MAX_AWAKE);
   }
   return;
 }
@@ -84,7 +68,7 @@ void led_setup(void) {
   led_transmit(MAX_INTENSITY, 0x0F);
   // see datasheet - this setting may impact your selection for the RSET resistor
   led_transmit(MAX_SCAN_LIMIT, MAX_SCAN3);
-  led_sleep(false);
+  led_transmit(MAX_SHUTDOWN, MAX_AWAKE);
   return;
 }
 
