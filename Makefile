@@ -62,7 +62,7 @@ MCU = atmega328p
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 16000000
+F_CPU = 1000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -80,7 +80,9 @@ OBJDIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+# There's a fancy way to get the include sources automagically, but this is easier
+SRC = $(TARGET).c \
+			include/led.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -114,7 +116,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = 
+EXTRAINCDIRS = include
 
 
 # Compiler flag to set the C Standard level.

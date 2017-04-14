@@ -68,7 +68,7 @@ void led_sleep(const bool sleep) {
 }
 
 // setup hardware SPI and run MAX72XX bootup init
-void led_setup() {
+void led_setup(void) {
   // power up SPI peripheral
   PRR &= !_BV(PRSPI);
 

@@ -1,3 +1,11 @@
 *.swp
 *.pyc
 *.o
+.dep/
+*.lst
+*.eep
+*.elf
+*.hex
+*.lss
+*.map
+*.sym

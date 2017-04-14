@@ -24,7 +24,7 @@ void led_print(const uint8_t digit, const uint8_t index);
 void led_sleep(const bool sleep);
 
 /*  Setup hardware SPI and MAX72XX*/
-void led_setup();
+void led_setup(void);
 
 /*  Write a MAX72XX reg
  *  @reg which register on the MAX to write
